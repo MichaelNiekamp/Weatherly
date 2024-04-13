@@ -4,9 +4,22 @@ import 'package:rain/model/weather_model.dart';
 import 'package:rain/services/weather_api_client.dart';
 import 'package:rain/views/additional_information.dart';
 import 'package:rain/views/current_weather.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future main() async {
   await dotenv.load(fileName: "dotenv");
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      appId: dotenv.env['FIREBASE_APP_ID']!,
+      apiKey: dotenv.env['FIREBASE_API_KEY']!,
+      projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+      authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
+      messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+    ),
+  );
   runApp(const MyApp());
 }
 
@@ -47,6 +60,17 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       data = newData;
     });
+    // Store data in Firestore
+    if (newData != null) {
+      await FirebaseFirestore.instance.collection('weatherData').add({
+        'cityName': newData.cityName,
+        'temperature': newData.temp,
+        'humidity': newData.humidity,
+        'pressure': newData.pressure,
+        'wind': newData.wind,
+        'feels_like': newData.feels_like,
+      });
+    }
   }
 
   @override

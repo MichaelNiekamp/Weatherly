@@ -12,7 +12,7 @@ class WeatherApiClient {
         "https://api.openweathermap.org/data/2.5/weather?q=$Location&appid=$KEY&units=imperial");
 
     var response = await http.get(endpoint);
-    var body = jsonDecode(response.body);
+    var body = json.decode(response.body);
     return Weather.fromJson(body);
   }
 }
